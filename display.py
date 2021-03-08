@@ -1,3 +1,4 @@
+import os
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 
@@ -6,10 +7,12 @@ def render_screen_image(temperature, thermostat, humidity, heating):
   out = Image.new('1', (400, 300), 255)
 
   # get a font
-  label_font = ImageFont.truetype("/Users/dtrafton/Library/Fonts/skyfonts-google/Roboto regular.ttf", 18)
-  label2_font = ImageFont.truetype("/Users/dtrafton/Library/Fonts/skyfonts-google/Roboto regular.ttf", 16)
-  label3_font = ImageFont.truetype("/Users/dtrafton/Library/Fonts/skyfonts-google/Roboto regular.ttf", 12)
-  unit_font = ImageFont.truetype("/Users/dtrafton/Library/Fonts/skyfonts-google/Roboto regular.ttf", 72)
+
+  font_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fonts', "Roboto.ttf")
+  label_font = ImageFont.truetype(font_path, 18)
+  label2_font = ImageFont.truetype(font_path, 16)
+  label3_font = ImageFont.truetype(font_path, 12)
+  unit_font = ImageFont.truetype(font_path, 72)
 
   # get a drawing context
   draw = ImageDraw.Draw(out)
