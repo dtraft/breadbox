@@ -1,9 +1,17 @@
 import smokesignal
 from threading import Timer
 
+from lib.waveshare_epd import epd4in2
+
 import display
 import store
 import relay
+
+epd = epd4in2.EPD()
+print("init and Clear")
+epd.init()
+epd.Clear()
+
 
 
 def debounce(wait):
@@ -43,12 +51,13 @@ def update_screen(**kwargs):
      last_thermostat != store.thermostat or 
      last_heating != relay.is_on()):
 
-    display.render_screen_image(
+    image = display.render_screen_image(
       temperature=store.temperature,
       thermostat=store.thermostat,
       humidity=store.humidity,
       heating=relay.is_on()
-    ).show()
+    )
+    epd.display(epd.getbuffer(image))
 
   # Track lasts
   last_temperature = store.temperature

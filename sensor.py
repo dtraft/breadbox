@@ -18,7 +18,7 @@ def background():
 
         smokesignal.emit('sensor_reading', temperature=temperature, humidity=humidity)
         
-        time.sleep(15)
+        time.sleep(30)
 
 sensors = threading.Thread(name='sensors', target=background)
 sensors.start()

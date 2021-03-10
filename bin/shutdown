@@ -1,8 +1,0 @@
-#!/bin/bash
-
-BASEDIR=$(dirname "$BASH_SOURCE")
-
-echo "Starting Breadbox"
-. venv/bin/activate
-
-python3 "$BASEDIR/../shutdown.py"
