@@ -15,10 +15,10 @@
 case "$1" in
   start)
     echo "Starting Breadbox"
-    /home/pi/Projects/breadbox/startup.py &
+    /home/pi/Projects/breadbox/startup.py
     ;;
   stop)
-    echo "Stopping listen-for-shutdown.py"
+    echo "Stopping Breadbox"
     pkill -f /home/pi/Projects/breadbox/startup.py
     /home/pi/Projects/breadbox/shutdown.py
     ;;

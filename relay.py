@@ -1,12 +1,14 @@
+from gpiozero import OutputDevice
 import smokesignal
 import statistics
 import store
 
 last_five_readings = []
-is_heating = False
+
+relay = OutputDevice(14, active_high=False)
 
 def is_on():
-  return is_heating
+  return relay.value
 
 @smokesignal.on('sensor_reading')
 def handle_sensor_reading(temperature, humidity):
@@ -24,13 +26,12 @@ def should_heat():
   return statistics.median(last_five_readings) < store.thermostat
 
 def adjust_relay():
-  global is_heating
-  if should_heat() and not is_heating:
-    print("Start heating (would change pin to HIGH)")
-    is_heating = True
-    smokesignal.emit('heating_updated', heating=is_heating)
-  elif is_heating and not should_heat():
-    print("End heating (would change pin to LOW)")
-    is_heating = False
-    smokesignal.emit('heating_updated', heating=is_heating)
+  if should_heat() and not is_on():
+    print("Starting heating")
+    relay.on()
+    smokesignal.emit('heating_updated', heating=is_on())
+  elif is_on()  and not should_heat():
+    print("Stopping heating")
+    relay.off()
+    smokesignal.emit('heating_updated', heating=is_on())
 

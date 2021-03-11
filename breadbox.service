@@ -1,0 +1,12 @@
+[Unit]
+Description=Breadbox
+After=network.target
+
+[Service]
+ExecStart=/home/pi/Projects/breadbox/startup.py
+ExecStop=/home/pi/Projects/breadbox/breadbox stop 
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
