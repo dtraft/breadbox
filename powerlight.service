@@ -1,0 +1,14 @@
+[Unit]
+Description=Breadbox
+Before=basic.target
+After=local-fs.target sysinit.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=True
+ExecStart=/home/pi/Projects/breadbox/powerlight.py start
+ExecEnd=/home/pi/Projects/breadbox/powerlight.py stop
+
+[Install]
+WantedBy=basic.target

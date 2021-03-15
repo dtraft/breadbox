@@ -1,17 +1,20 @@
 import smokesignal
-from threading import Timer
-
+from threading import Timer, Thread
+from queue import Queue
+import logging
 from lib.waveshare_epd import epd4in2
 
 import display
 import store
 import relay
 
+
+screen_queue = Queue()
+
+logging.info("Initializing e-ink display")
 epd = epd4in2.EPD()
-print("init and Clear")
 epd.init()
 epd.Clear()
-
 
 
 def debounce(wait):
@@ -36,10 +39,28 @@ last_humidity = store.humidity
 last_thermostat = store.thermostat
 last_heating = relay.is_on()
 
+def screen_worker():
+  while True:
+    screen_data = screen_queue.get()
+  
+    image = display.render_screen_image(
+      temperature=screen_data["temperature"],
+      thermostat=screen_data["thermostat"],
+      humidity=screen_data["humidity"],
+      heating=screen_data["is_heating"]
+    )
+    epd.display(epd.getbuffer(image))
+    
+    screen_queue.task_done()
+
+worker = Thread(target=screen_worker)
+worker.setDaemon(True)
+worker.start()
+
 @smokesignal.on('sensor_reading')
 @smokesignal.on('thermostat_updated')
 @smokesignal.on('heating_updated')
-@debounce(1)
+@debounce(3)
 def update_screen(**kwargs):
   global last_temperature
   global last_humidity
@@ -51,15 +72,15 @@ def update_screen(**kwargs):
      last_thermostat != store.thermostat or 
      last_heating != relay.is_on()):
 
-    image = display.render_screen_image(
-      temperature=store.temperature,
-      thermostat=store.thermostat,
-      humidity=store.humidity,
-      heating=relay.is_on()
-    )
-    epd.display(epd.getbuffer(image))
+    screen_queue.put({
+      "temperature": store.temperature,
+      "humidity": store.humidity,
+      "thermostat": store.thermostat,
+      "is_heating": relay.is_on()
+    })
 
-  # Track lasts
+      
+  # Track last readings
   last_temperature = store.temperature
   last_humidity = store.humidity
   last_thermostat = store.thermostat

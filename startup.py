@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# Configure logging
+import logging
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+
 from flask import Flask
 import smokesignal
 
@@ -28,6 +32,7 @@ def get_readings():
 @app.route('/api/thermostat/increment')
 def increment_thermostat():
   store.thermostat += 1
+  logging.info("Set thermostat to: %d" % store.thermostat)
   smokesignal.emit('thermostat_updated', thermostat=store.thermostat)
   return {
     'ok': True,
@@ -37,6 +42,7 @@ def increment_thermostat():
 @app.route('/api/thermostat/decrement')
 def decrement_thermostat():
   store.thermostat -= 1
+  logging.info("Set thermostat to: %d" % store.thermostat)
   smokesignal.emit('thermostat_updated', thermostat=store.thermostat)
   return {
     'ok': True,
@@ -44,4 +50,5 @@ def decrement_thermostat():
   }
 
 if __name__ == "__main__":
+  logging.info("Starting API")  
   app.run(host="0.0.0.0",debug=False, port=5000)
